@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+
+<script>
+MathJax = {
+  'skipStartupTypeset': true,
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+
+
+<p>
+  <textarea id="mathText" cols="30" rows="10">E = m c^2</textarea>
+
+<p>
+  <img id="output">
+
+<p>
+  <textarea id="outputBase64" cols="30" rows="10" readonly></textarea>
+
+<script>
+(function() {
+  function doConvert() {
+      let tex = $('#mathText').val();
+      let mjx = MathJax.tex2svg(tex);
+      let svg = $(mjx).find('svg')[0];
+
+      // https://stackoverflow.com/questions/36530123/html-with-tex-formulas-to-images
+      let img = new Image();
+      img.onload = function() {
+        let cvs = $('<canvas>')[0];
+        cvs.width = img.width;
+        cvs.height = img.height;
+
+        let ctx = cvs.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        let b64 = cvs.toDataURL('image/png');
+
+        $('#output').attr('src', b64);
+        $('#outputBase64').val(b64);
+
+      };
+      img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+  }
+
+  $('#mathText').on('keyup change', function() {
+    doConvert();
+  });
+
+  doConvert();
+})();
+</script>
